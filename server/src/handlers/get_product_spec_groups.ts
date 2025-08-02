@@ -1,8 +1,17 @@
 
+import { db } from '../db';
+import { productSpecGroupsTable } from '../db/schema';
 import { type ProductSpecGroup } from '../schema';
 
-export async function getProductSpecGroups(): Promise<ProductSpecGroup[]> {
-    // This is a placeholder declaration! Real code should be implemented here.
-    // The goal of this handler is fetching all product specification groups from the database.
-    return [];
-}
+export const getProductSpecGroups = async (): Promise<ProductSpecGroup[]> => {
+  try {
+    const results = await db.select()
+      .from(productSpecGroupsTable)
+      .execute();
+
+    return results;
+  } catch (error) {
+    console.error('Failed to get product spec groups:', error);
+    throw error;
+  }
+};

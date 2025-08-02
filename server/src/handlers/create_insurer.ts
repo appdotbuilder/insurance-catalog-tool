@@ -1,11 +1,21 @@
 
+import { db } from '../db';
+import { insurersTable } from '../db/schema';
 import { type CreateInsurerInput, type Insurer } from '../schema';
 
-export async function createInsurer(input: CreateInsurerInput): Promise<Insurer> {
-    // This is a placeholder declaration! Real code should be implemented here.
-    // The goal of this handler is creating a new insurer and persisting it in the database.
-    return {
-        id: '00000000-0000-0000-0000-000000000000', // Placeholder UUID
+export const createInsurer = async (input: CreateInsurerInput): Promise<Insurer> => {
+  try {
+    // Insert insurer record
+    const result = await db.insert(insurersTable)
+      .values({
         name: input.name,
-    } as Insurer;
-}
+      })
+      .returning()
+      .execute();
+
+    return result[0];
+  } catch (error) {
+    console.error('Insurer creation failed:', error);
+    throw error;
+  }
+};

@@ -1,9 +1,19 @@
 
+import { db } from '../db';
+import { productSpecGroupChoiceValuesTable } from '../db/schema';
 import { type GetProductSpecGroupChoiceValuesInput, type ProductSpecGroupChoiceValue } from '../schema';
+import { eq } from 'drizzle-orm';
 
 export async function getProductSpecGroupChoiceValues(input: GetProductSpecGroupChoiceValuesInput): Promise<ProductSpecGroupChoiceValue[]> {
-    // This is a placeholder declaration! Real code should be implemented here.
-    // The goal of this handler is fetching all values for a specific product specification group choice.
-    // This is used to determine ProductSpec values when a group choice is selected.
-    return [];
+  try {
+    const results = await db.select()
+      .from(productSpecGroupChoiceValuesTable)
+      .where(eq(productSpecGroupChoiceValuesTable.product_spec_group_choice_id, input.choice_id))
+      .execute();
+
+    return results;
+  } catch (error) {
+    console.error('Failed to get product spec group choice values:', error);
+    throw error;
+  }
 }

@@ -1,11 +1,13 @@
 
+import { db } from '../db';
+import { productSpecsTable } from '../db/schema';
 import { type CreateProductSpecInput, type ProductSpec } from '../schema';
 
-export async function createProductSpec(input: CreateProductSpecInput): Promise<ProductSpec> {
-    // This is a placeholder declaration! Real code should be implemented here.
-    // The goal of this handler is creating a new product specification and persisting it in the database.
-    return {
-        id: '00000000-0000-0000-0000-000000000000', // Placeholder UUID
+export const createProductSpec = async (input: CreateProductSpecInput): Promise<ProductSpec> => {
+  try {
+    // Insert product spec record
+    const result = await db.insert(productSpecsTable)
+      .values({
         shortname: input.shortname,
         description: input.description,
         default_value: input.default_value,
@@ -14,5 +16,19 @@ export async function createProductSpec(input: CreateProductSpecInput): Promise<
         max_value: input.max_value,
         editable: input.editable,
         group_id: input.group_id,
-    } as ProductSpec;
-}
+      })
+      .returning()
+      .execute();
+
+    // Convert numeric fields back to numbers before returning
+    const productSpec = result[0];
+    return {
+      ...productSpec,
+      min_value: productSpec.min_value !== null ? parseFloat(productSpec.min_value.toString()) : null,
+      max_value: productSpec.max_value !== null ? parseFloat(productSpec.max_value.toString()) : null,
+    };
+  } catch (error) {
+    console.error('Product spec creation failed:', error);
+    throw error;
+  }
+};
